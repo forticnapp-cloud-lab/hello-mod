@@ -63,8 +63,13 @@ exports.manageIndexRoute = function(req, res){
     res.status(503).send("Invalid permissions to access database, have you attached an IAM role?");
   }else if(pwned < pwned_max){
     pwned = pwned + 1;
-    res.render(dir + '/public/index.html',{locals: {hello_message: global.hello_message} });
+    var image = false
+    if(global.image_url != ""){
+      image = true
+    }
+    res.render('main', {layout : 'index', hello_message: global.hello_message, image: image, image_url: global.image_url});
   }else{
     res.sendFile(__dirname + '/public/index.html');
   }
 }
+
