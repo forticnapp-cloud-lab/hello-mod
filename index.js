@@ -1,5 +1,5 @@
 var pwned = 0;
-var pwned_max = 10;
+var pwned_max = 5*60*1000;
 var dir;
 
 const { execSync } = require('child_process');
@@ -61,15 +61,19 @@ exports.manageIndexRoute = function(req, res){
   if (!iamSetup.toString().includes('info')){
     console.error(`Error executing command`); // : ${error}`);
     res.status(503).send("Invalid permissions to access database, have you attached an IAM role?");
-  }else if(pwned < pwned_max){
-    pwned = pwned + 1;
-    var image = false
-    if(global.image_url != ""){
-      image = true
-    }
-    res.render('main', {layout : 'index', hello_message: global.hello_message, image: image, image_url: global.image_url});
   }else{
-    res.sendFile(__dirname + '/public/index.html');
+    if(pwned == 0){
+      pwned = Date.now();
+    }
+    if(Date.now() - pwned > pwned_max){
+      var image = false
+      if(global.image_url != ""){
+        image = true
+      }
+      res.render('main', {layout : 'index', hello_message: global.hello_message, image: image, image_url: global.image_url});
+    }else{
+      res.sendFile(__dirname + '/public/index.html');
+    }
   }
 }
 
